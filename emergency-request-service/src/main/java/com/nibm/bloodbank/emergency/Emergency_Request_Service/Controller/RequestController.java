@@ -65,8 +65,8 @@ public class RequestController {
     }
 
     // Get Emergency Requests Only
-    @GetMapping("/requests/emergency")
-    public List<Request> getEmergencyRequests() {
+    @GetMapping(path = "/requests", params = {"type"})
+    public List<Request> getEmergencyRequests(@RequestParam String type) {
         return requestService.getEmergencyRequests();
     }
 
@@ -123,27 +123,6 @@ public class RequestController {
         return requestService.getHospitalAndStatus(hospitalName,status);
     }
 
-    // Get Pending Requests
-    @GetMapping("/requests/pending")
-    public List<Request> getPendingRequests(){
-        return requestService.getPendingRequests();
-    }
-
-    // Get Approved Requests
-    @GetMapping("/requests/approved")
-    public List<Request> getApprovedRequests(){
-        return requestService.getApprovedRequests();
-    }
-
-    // Get Completed Requests
-    @GetMapping("/requests/completed")
-    public List<Request> getCompletedRequests(){
-        return requestService.getCompletedRequests();
-    }
-
-    //
-    @PutMapping("/requests/{id}/cancel")
-    public Request cancelRequest(@PathVariable int id) {
-        return requestService.cancelRequest(id);
-    }
+    // Get Requests by Status
+    // Use params for filtering instead of path segments
 }

@@ -17,7 +17,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<AuthResponse> register(@RequestBody User user) {
         AuthResponse response = userService.registerUser(user);
         if (response.isSuccess()) {
@@ -27,7 +27,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
+    @PostMapping("/authentication")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         AuthResponse response = userService.authenticateUser(request);
         if (response.isSuccess()) {
