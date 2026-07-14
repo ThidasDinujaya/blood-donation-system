@@ -9,44 +9,43 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "*")
-@RequestMapping(path = "/api/inventories")
+@RequestMapping(path = "/api")
 public class BloodInventoryController {
 
     @Autowired
     private BloodInventoryService obj;
 
-    @GetMapping
+    @GetMapping(path = "/bloodinventories")
     public List<BloodInventory> getAllInventory() {
         return obj.getAllInventory();
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/bloodinventories/{id}")
     public BloodInventory getInventoryById(@PathVariable int id) {
         return obj.getInventoryById(id);
     }
 
-    @GetMapping(path = "/bloodgroups/{bloodGroup}")
-    public List<BloodInventory> getInventoryByBloodGroup(@PathVariable String bloodGroup) {
+    @GetMapping(path = "/bloodinventories", params = {"bloodGroup"})
+    public List<BloodInventory> getInventoryByBloodGroup(@RequestParam String bloodGroup) {
         return obj.getInventoryByBloodGroup(bloodGroup);
     }
 
-    @PostMapping
+    @PostMapping(path = "/bloodinventories")
     public BloodInventory createInventory(@RequestBody BloodInventory inventory) {
         return obj.createInventory(inventory);
     }
 
-    @PutMapping(path = "/{id}")
+    @PutMapping(path = "/bloodinventories/{id}")
     public BloodInventory updateInventoryById(@PathVariable int id, @RequestBody BloodInventory inventory) {
         return obj.updateInventory(id, inventory);
     }
 
-    @DeleteMapping(path = "/{id}")
+    @DeleteMapping(path = "/bloodinventories/{id}")
     public void deleteInventoryById(@PathVariable int id) {
         obj.deleteInventoryById(id);
     }
 
-    @PostMapping(path = "/reservations")
+    @PostMapping(path = "/bloodinventories/reservations")
     public BloodInventory reserve(@RequestParam String bloodGroup, @RequestParam int units) {
         return obj.reserveUnits(bloodGroup, units);
     }
