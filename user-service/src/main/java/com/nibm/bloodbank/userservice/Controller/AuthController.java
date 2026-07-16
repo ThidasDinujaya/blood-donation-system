@@ -6,9 +6,12 @@ import com.nibm.bloodbank.userservice.Data.User;
 import com.nibm.bloodbank.userservice.Service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.nibm.bloodbank.userservice.Data.LogoutRequest;
+
+import java.util.Collections;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -33,5 +36,23 @@ public class AuthController {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.status(401).body(response);
+    }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<AuthResponse> logout(@RequestBody LogoutRequest request) {
+
+        AuthResponse response = userService.logoutUser(request.getRefreshToken());
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkEmailAvailability(@RequestParam String email) {
+        boolean isRegistered = userService.isEmailRegistered(email);
+        return ResponseEntity.ok(Collections.singletonMap("isRegistered", isRegistered));
     }
 }

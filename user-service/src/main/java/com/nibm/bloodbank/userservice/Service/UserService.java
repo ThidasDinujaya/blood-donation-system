@@ -36,8 +36,40 @@ public class UserService {
         }
     }
 
+    public AuthResponse logoutUser(String refreshToken) {
+        // In a real application, you would invalidate the refresh token.
+        // For this example, we'll just return a success message.
+        return new AuthResponse("Logout successful.", true);
+    }
+
+    public boolean isEmailRegistered(String email) {
+        return userRepository.findByEmail(email).isPresent();
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
+    }
+
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public AuthResponse changePassword(String email, ChangePasswordRequest request) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            return new AuthResponse("User not found.", false);
+        }
+        User user = userOpt.get();
+        if (!user.getPassword().equals(request.getOldPassword())) {
+            return new AuthResponse("Invalid old password.", false);
+        }
+        user.setPassword(request.getNewPassword());
+        userRepository.save(user);
+        return new AuthResponse("Password updated successfully.", true);
     }
 
     public AuthResponse updateUserProfile(Long id, UpdateProfileRequest request) {
