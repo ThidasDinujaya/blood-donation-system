@@ -128,4 +128,8 @@ public class UserService {
             return daysSinceLastDonation >= 90;
         }).collect(Collectors.toList());
     }
+
+    public List<User> findByBloodGroup(String bloodGroup) {
+        return userRepository.findByBloodGroup(bloodGroup);
+    }
 }

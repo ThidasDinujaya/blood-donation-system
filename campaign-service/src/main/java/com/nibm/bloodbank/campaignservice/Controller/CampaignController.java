@@ -29,7 +29,7 @@ public class CampaignController {
         return campaignService.createCampaign(campaign);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/campaigns/{id}")
     public Campaign updateCampaign(@PathVariable int id, @RequestBody Campaign campaign) {
         campaign.setId(id);
         return campaignService.updateCampaign(campaign);

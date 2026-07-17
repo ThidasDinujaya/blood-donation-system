@@ -64,7 +64,9 @@ export default function FindDonorsPage() {
 
       {searched && !loading && donors.length === 0 && (
         <div className="empty">
-          <div className="empty-icon">🔍</div>
+          <div className="empty-icon">
+            <i className="fi fi-rr-search" style={{ fontSize: '2.2rem', color: 'var(--red)', opacity: 0.4 }} />
+          </div>
           <h3>No eligible donors found</h3>
           <p>Try a different blood group or city.</p>
         </div>

@@ -76,8 +76,9 @@ export default function EmergencyRequestsPage() {
 
       {/* Alert banner for critical requests */}
       {!loading && critical > 0 && (
-        <div className="alert alert-error" style={{ marginBottom: 20 }}>
-          ⚠️ {critical} CRITICAL request{critical > 1 ? 's' : ''} require immediate attention.
+        <div className="alert alert-error" style={{ marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <i className="fi fi-rr-triangle-warning" style={{ fontSize: 16, flexShrink: 0 }} />
+          {critical} CRITICAL request{critical > 1 ? 's' : ''} require immediate attention.
         </div>
       )}
 
@@ -207,7 +208,9 @@ export default function EmergencyRequestsPage() {
 
       {!loading && requests.length === 0 && (
         <div className="empty">
-          <div className="empty-icon">🚨</div>
+          <div className="empty-icon">
+            <i className="fi fi-rr-bell-ring" style={{ fontSize: '2.2rem', color: 'var(--red)', opacity: 0.4 }} />
+          </div>
           <h3>No requests found</h3>
         </div>
       )}

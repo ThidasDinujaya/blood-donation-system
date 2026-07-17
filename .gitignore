@@ -36,3 +36,17 @@ target/
 # OS files
 .DS_Store
 Thumbs.db
+
+# vscode
+.vscode/
+
+# Node/React dependencies and builds
+node_modules/
+dist/
+dist-ssr/
+build/
+*.local
+
+# Environment variables
+.env
+.env.*
