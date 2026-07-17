@@ -66,6 +66,12 @@ public class UserController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/blood-group/{bloodGroup}")
+    public ResponseEntity<List<User>> getUsersByBloodGroup(@PathVariable String bloodGroup) {
+        List<User> users = userService.findByBloodGroup(bloodGroup);
+        return ResponseEntity.ok(users);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<AuthResponse> updateUserProfile(

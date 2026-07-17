@@ -28,21 +28,21 @@ const put  = (path, body)  => request('PUT',    path, body);
 const del  = (path)        => request('DELETE', path);
 
 // ── Auth (user-service) ──────────────────────────────────────────────────────
-export const registerUser = (data)    => post('/api/v1/auth/register', data);
-export const loginUser    = (data)    => post('/api/v1/auth/login',    data);
+export const registerUser = (data)    => post('/api/auth/register', data);
+export const loginUser    = (data)    => post('/api/auth/login',    data);
 
 // ── Users (user-service) ─────────────────────────────────────────────────────
-export const getUserById       = (id)                       => get(`/api/v1/users/${id}`);
-export const updateUser        = (id, data)                 => put(`/api/v1/users/${id}`, data);
-export const deleteUser        = (id)                       => del(`/api/v1/users/${id}`);
-export const getUsersByBloodGroup = (bloodGroup)            => get(`/api/v1/users/blood-group/${bloodGroup}`);
-export const searchEligibleDonors = (bloodGroup, city)     => get(`/api/v1/users/search?bloodGroup=${encodeURIComponent(bloodGroup)}&city=${encodeURIComponent(city)}`);
+export const getUserById       = (id)                       => get(`/api/users/${id}`);
+export const updateUser        = (id, data)                 => put(`/api/users/${id}`, data);
+export const deleteUser        = (id)                       => del(`/api/users/${id}`);
+export const getUsersByBloodGroup = (bloodGroup)            => get(`/api/users/blood-group/${bloodGroup}`);
+export const searchEligibleDonors = (bloodGroup, city)     => get(`/api/users/search?bloodGroup=${encodeURIComponent(bloodGroup)}&city=${encodeURIComponent(city)}`);
 
 // ── Campaigns (campaign-service) ─────────────────────────────────────────────
 export const getAllCampaigns        = ()               => get('/api/campaigns');
 export const getCampaignById        = (id)            => get(`/api/campaigns/${id}`);
 export const createCampaign         = (data)          => post('/api/campaigns', data);
-export const updateCampaign         = (data)          => put('/api/campaigns', data);
+export const updateCampaign         = (id, data)      => put(`/api/campaigns/${id}`, data);
 export const deleteCampaign         = (id)            => del(`/api/campaigns/${id}`);
 export const getUpcomingCampaigns   = ()              => get('/api/campaigns?upcoming');
 export const getCampaignsByLocation = (location)      => get(`/api/campaigns?location=${encodeURIComponent(location)}`);
@@ -51,10 +51,10 @@ export const getCampaignsByLocation = (location)      => get(`/api/campaigns?loc
 export const getAllAppointments            = ()           => get('/api/appointments');
 export const getAppointmentById           = (id)         => get(`/api/appointments/${id}`);
 export const createAppointment            = (data)       => post('/api/appointments', data);
-export const updateAppointment            = (data)       => put('/api/appointments', data);
+export const updateAppointment            = (id, data)   => put(`/api/appointments/${id}`, data);
 export const deleteAppointment            = (id)         => del(`/api/appointments/${id}`);
-export const getAppointmentsByCampaign    = (campaignId) => get(`/api/appointments/campaign/${campaignId}`);
-export const getAppointmentsByDonor       = (donorId)    => get(`/api/appointments/donor/${donorId}`);
+export const getAppointmentsByCampaign    = (campaignId) => get(`/api/appointments?campaignId=${campaignId}`);
+export const getAppointmentsByDonor       = (donorId)    => get(`/api/appointments?donorId=${donorId}`);
 export const getAppointmentsByStatus      = (status)     => get(`/api/appointments?status=${encodeURIComponent(status)}`);
 
 // ── Blood Inventory (inventory-service) ──────────────────────────────────────
@@ -77,4 +77,4 @@ export const getRequestsByPriority  = (priority)      => get(`/request/api/reque
 export const getEmergencyRequests   = ()              => get('/request/api/requests?type=EMERGENCY');
 
 // ── Notifications (notification-service) ─────────────────────────────────────
-export const sendNotification = (data) => post('/api/v1/notifications/send', data);
+export const sendNotification = (data) => post('/api/notifications/send', data);
