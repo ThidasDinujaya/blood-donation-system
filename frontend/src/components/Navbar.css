@@ -1,0 +1,76 @@
+/* Navbar — OneBlood-style: white bar, bold logo, red CTA */
+
+.navbar {
+  display: flex;
+  align-items: center;
+  height: 58px;
+  padding: 0 28px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.navbar-logo {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--red);
+  letter-spacing: -0.4px;
+  margin-right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
+
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.navbar-link {
+  padding: 6px 11px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: color var(--transition), background var(--transition);
+  white-space: nowrap;
+}
+.navbar-link:hover  { color: var(--red); background: var(--red-bg); }
+.navbar-link.active {
+  color: var(--red);
+  background: var(--red-bg);
+  font-weight: 600;
+}
+
+.navbar-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .navbar { padding: 0 16px; }
+  .navbar-logo { margin-right: 16px; }
+}
+@media (max-width: 768px) {
+  .navbar-links { display: none; }
+}
