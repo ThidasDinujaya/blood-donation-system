@@ -69,7 +69,9 @@ export default function MyAppointmentsPage() {
 
       {!loading && loaded && appts.length === 0 && (
         <div className="empty">
-          <div className="empty-icon">📅</div>
+          <div className="empty-icon">
+            <i className="fi fi-rr-calendar" style={{ fontSize: '2.2rem', color: 'var(--red)', opacity: 0.4 }} />
+          </div>
           <h3>No appointments found</h3>
           <p>Book a slot at a campaign to get started.</p>
         </div>

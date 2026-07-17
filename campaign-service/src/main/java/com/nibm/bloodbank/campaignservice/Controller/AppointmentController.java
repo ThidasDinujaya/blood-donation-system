@@ -28,8 +28,9 @@ public class AppointmentController {
         return appointmentService.createAppointment(appointment);
     }
 
-    @PutMapping("/appointments")
-    public Appointment updateAppointment(@RequestBody Appointment appointment) {
+    @PutMapping("/appointments/{id}")
+    public Appointment updateAppointment(@PathVariable int id, @RequestBody Appointment appointment) {
+        appointment.setId(id);
         return appointmentService.updateAppointment(appointment);
     }
 

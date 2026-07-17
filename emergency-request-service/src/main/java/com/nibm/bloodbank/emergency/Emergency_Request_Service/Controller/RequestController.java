@@ -32,7 +32,7 @@ public class RequestController {
     }
 
     // Delete Request using by id
-    @DeleteMapping("requests/{id}")
+    @DeleteMapping("/api/requests/{id}")
     public String deleteRequest(@PathVariable Integer id) {
         requestService.deleteRequest(id);
         return "Request deleted successfully";

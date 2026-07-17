@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final UserService userService;
@@ -18,7 +18,7 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping("/users")
+    @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody User user) {
         AuthResponse response = userService.registerUser(user);
         if (response.isSuccess()) {
@@ -27,7 +27,7 @@ public class AuthController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @PostMapping("/sessions")
+    @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         AuthResponse response = userService.authenticateUser(request);
         if (response.isSuccess()) {
@@ -36,12 +36,12 @@ public class AuthController {
         return ResponseEntity.status(401).body(response);
     }
 
-    @DeleteMapping("/sessions/current")
+    @DeleteMapping("/logout")
     public ResponseEntity<AuthResponse> logout() {
         return ResponseEntity.ok(new AuthResponse("Logout successful.", true));
     }
 
-    @GetMapping("/emails")
+    @GetMapping("/check-email")
     public ResponseEntity<?> checkEmailAvailability(@RequestParam String email) {
         boolean isRegistered = userService.isEmailRegistered(email);
         return ResponseEntity.ok(java.util.Collections.singletonMap("isRegistered", isRegistered));

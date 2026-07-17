@@ -13,6 +13,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -64,6 +66,12 @@ public class UserController {
         Optional<User> user = userService.getUserById(id);
         return user.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/blood-group/{bloodGroup}")
+    public ResponseEntity<List<User>> getUsersByBloodGroup(@PathVariable String bloodGroup) {
+        List<User> users = userService.findByBloodGroup(bloodGroup);
+        return ResponseEntity.ok(users);
     }
 
     @PutMapping("/{id}")
