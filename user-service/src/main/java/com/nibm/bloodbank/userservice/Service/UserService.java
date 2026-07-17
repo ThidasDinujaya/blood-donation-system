@@ -1,6 +1,10 @@
 package com.nibm.bloodbank.userservice.Service;
 
 import com.nibm.bloodbank.userservice.Data.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -11,15 +15,18 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public AuthResponse registerUser(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return new AuthResponse("Email is already registered.", false);
         }
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return new AuthResponse("User registered successfully.", true);
     }
@@ -29,7 +36,7 @@ public class UserService {
         if (existingUser.isEmpty()) {
             return new AuthResponse("User not found.", false);
         }
-        if (existingUser.get().getPassword().equals(request.getPassword())) {
+        if (passwordEncoder.matches(request.getPassword(), existingUser.get().getPassword())) {
             return new AuthResponse("Login successful. UserID: " + existingUser.get().getId(), true);
         } else {
             return new AuthResponse("Invalid credentials.", false);
@@ -46,8 +53,13 @@ public class UserService {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Page<User> findUsers(String city, String bloodGroup, Boolean availableToDonate, Pageable pageable) {
+        Specification<User> spec = UserSpecification.findByCriteria(city, bloodGroup, availableToDonate);
+        return userRepository.findAll(spec, pageable);
+    }
+
+    public List<BloodGroupCount> getBloodGroupCounts() {
+        return userRepository.countUsersByBloodGroup();
     }
 
     public Optional<User> getUserById(Long id) {
@@ -64,10 +76,10 @@ public class UserService {
             return new AuthResponse("User not found.", false);
         }
         User user = userOpt.get();
-        if (!user.getPassword().equals(request.getOldPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             return new AuthResponse("Invalid old password.", false);
         }
-        user.setPassword(request.getNewPassword());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         return new AuthResponse("Password updated successfully.", true);
     }

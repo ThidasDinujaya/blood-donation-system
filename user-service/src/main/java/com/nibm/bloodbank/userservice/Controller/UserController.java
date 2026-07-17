@@ -5,11 +5,14 @@ import com.nibm.bloodbank.userservice.Data.ChangePasswordRequest;
 import com.nibm.bloodbank.userservice.Data.UpdateProfileRequest;
 import com.nibm.bloodbank.userservice.Data.User;
 import com.nibm.bloodbank.userservice.Service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -23,8 +26,13 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<User>> findUsers(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String bloodGroup,
+            @RequestParam(required = false) Boolean availableToDonate,
+            Pageable pageable) {
+        Page<User> users = userService.findUsers(city, bloodGroup, availableToDonate, pageable);
         return ResponseEntity.ok(users);
     }
 
@@ -39,7 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/me/password")
-    public ResponseEntity<AuthResponse> changePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<AuthResponse> changePassword(@AuthenticationPrincipal UserDetails userDetails, @Valid @RequestBody ChangePasswordRequest request) {
         if (userDetails == null) {
             return ResponseEntity.status(401).build();
         }
@@ -51,6 +59,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> getUserProfile(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
         return user.map(ResponseEntity::ok)
@@ -58,9 +67,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<AuthResponse> updateUserProfile(
             @PathVariable Long id,
-            @RequestBody UpdateProfileRequest request) {
+            @Valid @RequestBody UpdateProfileRequest request) {
         AuthResponse response = userService.updateUserProfile(id, request);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -69,26 +79,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthResponse> deleteUser(@PathVariable Long id) {
         AuthResponse response = userService.deleteUser(id);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
         }
         return ResponseEntity.badRequest().body(response);
-    }
-
-    @GetMapping("/blood-group/{bloodGroup}")
-    public ResponseEntity<List<User>> getUsersByBloodGroup(@PathVariable String bloodGroup) {
-        List<User> users = userService.getUsersByBloodGroup(bloodGroup);
-        return ResponseEntity.ok(users);
-    }
-
-
-    @GetMapping("/search")
-    public ResponseEntity<List<User>> searchEligibleDonors(
-            @RequestParam String bloodGroup,
-            @RequestParam String city) {
-        List<User> eligibleDonors = userService.getEligibleDonors(bloodGroup, city);
-        return ResponseEntity.ok(eligibleDonors);
     }
 }

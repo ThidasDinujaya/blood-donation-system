@@ -4,14 +4,12 @@ import com.nibm.bloodbank.userservice.Data.AuthRequest;
 import com.nibm.bloodbank.userservice.Data.AuthResponse;
 import com.nibm.bloodbank.userservice.Data.User;
 import com.nibm.bloodbank.userservice.Service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.nibm.bloodbank.userservice.Data.LogoutRequest;
-
-import java.util.Collections;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class AuthController {
 
     private final UserService userService;
@@ -20,8 +18,8 @@ public class AuthController {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody User user) {
+    @PostMapping("/users")
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody User user) {
         AuthResponse response = userService.registerUser(user);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -29,8 +27,8 @@ public class AuthController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    @PostMapping("/sessions")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         AuthResponse response = userService.authenticateUser(request);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -38,21 +36,14 @@ public class AuthController {
         return ResponseEntity.status(401).body(response);
     }
 
-
-    @PostMapping("/logout")
-    public ResponseEntity<AuthResponse> logout(@RequestBody LogoutRequest request) {
-
-        AuthResponse response = userService.logoutUser(request.getRefreshToken());
-
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
-        }
-        return ResponseEntity.badRequest().body(response);
+    @DeleteMapping("/sessions/current")
+    public ResponseEntity<AuthResponse> logout() {
+        return ResponseEntity.ok(new AuthResponse("Logout successful.", true));
     }
 
-    @GetMapping("/check-email")
+    @GetMapping("/emails")
     public ResponseEntity<?> checkEmailAvailability(@RequestParam String email) {
         boolean isRegistered = userService.isEmailRegistered(email);
-        return ResponseEntity.ok(Collections.singletonMap("isRegistered", isRegistered));
+        return ResponseEntity.ok(java.util.Collections.singletonMap("isRegistered", isRegistered));
     }
 }
