@@ -26,7 +26,7 @@ public class UserService {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return new AuthResponse("Email is already registered.", false);
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(user.getPassword());
         userRepository.save(user);
         return new AuthResponse("User registered successfully.", true);
     }
@@ -36,7 +36,7 @@ public class UserService {
         if (existingUser.isEmpty()) {
             return new AuthResponse("User not found.", false);
         }
-        if (passwordEncoder.matches(request.getPassword(), existingUser.get().getPassword())) {
+        if (request.getPassword().equals(existingUser.get().getPassword())) {
             return new AuthResponse("Login successful. UserID: " + existingUser.get().getId(), true);
         } else {
             return new AuthResponse("Invalid credentials.", false);
@@ -76,10 +76,10 @@ public class UserService {
             return new AuthResponse("User not found.", false);
         }
         User user = userOpt.get();
-        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+        if (!request.getOldPassword().equals(user.getPassword())) {
             return new AuthResponse("Invalid old password.", false);
         }
-        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPassword(request.getNewPassword());
         userRepository.save(user);
         return new AuthResponse("Password updated successfully.", true);
     }
