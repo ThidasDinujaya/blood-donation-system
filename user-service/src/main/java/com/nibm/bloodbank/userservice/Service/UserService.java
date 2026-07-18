@@ -1,11 +1,9 @@
 package com.nibm.bloodbank.userservice.Service;
 
 import com.nibm.bloodbank.userservice.Data.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -14,13 +12,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public AuthResponse registerUser(User user) {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
@@ -30,29 +24,11 @@ public class UserService {
         String role = user.getRole() == null ? "ROLE_USER" : user.getRole();
         user.setRole(role);
 
-        // All users: firstName, lastName, phoneNumber, city are mandatory
-        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
-            return new AuthResponse("First name is required.", false);
-        }
-        if (user.getLastName() == null || user.getLastName().isBlank()) {
-            return new AuthResponse("Last name is required.", false);
-        }
-        if (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank()) {
-            return new AuthResponse("Phone number is required.", false);
-        }
-        if (user.getCity() == null || user.getCity().isBlank()) {
-            return new AuthResponse("City is required.", false);
-        }
-
         if ("ROLE_HOSPITAL".equals(role)) {
-            if (user.getHospitalName() == null || user.getHospitalName().isBlank()) {
-                return new AuthResponse("Hospital name is required.", false);
-            }
             user.setBloodGroup(null);
             user.setAvailableToDonate(false);
             user.setLastDonationDate(null);
         } else {
-            // Donor (ROLE_USER) or other non-hospital roles
             if (user.getBloodGroup() == null || user.getBloodGroup().isBlank()) {
                 return new AuthResponse("Blood group is required for donors.", false);
             }
@@ -79,19 +55,12 @@ public class UserService {
         }
     }
 
-    public AuthResponse logoutUser(String refreshToken) {
-        // In a real application, you would invalidate the refresh token.
-        // For this example, we'll just return a success message.
-        return new AuthResponse("Logout successful.", true);
-    }
-
     public boolean isEmailRegistered(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    public Page<User> findUsers(String city, String bloodGroup, Boolean availableToDonate, Pageable pageable) {
-        Specification<User> spec = UserSpecification.findByCriteria(city, bloodGroup, availableToDonate);
-        return userRepository.findAll(spec, pageable);
+    public List<User> findUsers(String city, String bloodGroup, Boolean availableToDonate, String role) {
+        return userRepository.findByCriteria(city, bloodGroup, availableToDonate, role);
     }
 
     public List<BloodGroupCount> getBloodGroupCounts() {
@@ -106,41 +75,43 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public AuthResponse changePassword(String email, ChangePasswordRequest request) {
+    public AuthResponse changePassword(String email, String oldPassword, String newPassword) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             return new AuthResponse("User not found.", false);
         }
         User user = userOpt.get();
-        if (!request.getOldPassword().equals(user.getPassword())) {
+        if (!oldPassword.equals(user.getPassword())) {
             return new AuthResponse("Invalid old password.", false);
         }
-        user.setPassword(request.getNewPassword());
+        user.setPassword(newPassword);
         userRepository.save(user);
         return new AuthResponse("Password updated successfully.", true);
     }
 
-    public AuthResponse updateUserProfile(Long id, UpdateProfileRequest request) {
+    public AuthResponse updateUserProfile(Long id, String firstName, String lastName,
+                                           String hospitalName, String phoneNumber, String city,
+                                           String bloodGroup, Boolean availableToDonate, String lastDonationDate) {
         Optional<User> existingUserOpt = userRepository.findById(id);
         if (existingUserOpt.isEmpty()) {
             return new AuthResponse("User not found.", false);
         }
 
         User user = existingUserOpt.get();
-        if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
-        if (request.getLastName() != null) user.setLastName(request.getLastName());
-        if (request.getHospitalName() != null) user.setHospitalName(request.getHospitalName());
-        if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
-        if (request.getCity() != null) user.setCity(request.getCity());
+        if (firstName != null) user.setFirstName(firstName);
+        if (lastName != null) user.setLastName(lastName);
+        if (hospitalName != null) user.setHospitalName(hospitalName);
+        if (phoneNumber != null) user.setPhoneNumber(phoneNumber);
+        if (city != null) user.setCity(city);
 
         if ("ROLE_HOSPITAL".equals(user.getRole())) {
             user.setBloodGroup(null);
             user.setAvailableToDonate(false);
             user.setLastDonationDate(null);
         } else {
-            if (request.getBloodGroup() != null) user.setBloodGroup(request.getBloodGroup());
-            if (request.getAvailableToDonate() != null) user.setAvailableToDonate(request.getAvailableToDonate());
-            if (request.getLastDonationDate() != null) user.setLastDonationDate(request.getLastDonationDate());
+            if (bloodGroup != null) user.setBloodGroup(bloodGroup);
+            if (availableToDonate != null) user.setAvailableToDonate(availableToDonate);
+            if (lastDonationDate != null) user.setLastDonationDate(lastDonationDate);
         }
 
         userRepository.save(user);
@@ -159,11 +130,9 @@ public class UserService {
         return userRepository.findByBloodGroup(bloodGroup);
     }
 
-    // Find available and safe donors in a specific city
     public List<User> getEligibleDonors(String bloodGroup, String city) {
         List<User> availableDonors = userRepository.findByBloodGroupAndCityAndAvailableToDonateTrue(bloodGroup, city);
 
-        // Filter out donors who donated less than 90 days ago
         return availableDonors.stream().filter(user -> {
             if ("ROLE_HOSPITAL".equals(user.getRole()) || "ROLE_ADMIN".equals(user.getRole())) {
                 return false;
@@ -171,12 +140,9 @@ public class UserService {
             if (user.getLastDonationDate() == null) {
                 return true;
             }
-            long daysSinceLastDonation = ChronoUnit.DAYS.between(user.getLastDonationDate(), LocalDate.now());
+            long daysSinceLastDonation = ChronoUnit.DAYS.between(
+                    LocalDate.parse(user.getLastDonationDate()), LocalDate.now());
             return daysSinceLastDonation >= 90;
         }).collect(Collectors.toList());
-    }
-
-    public List<User> findByBloodGroup(String bloodGroup) {
-        return userRepository.findByBloodGroup(bloodGroup);
     }
 }

@@ -36,8 +36,13 @@ export const loginUser    = (data)    => post('/api/auth/login',    data);
 export const getUserById       = (id)                       => get(`/api/users/${id}`);
 export const updateUser        = (id, data)                 => put(`/api/users/${id}`, data);
 export const deleteUser        = (id)                       => del(`/api/users/${id}`);
-export const getUsersByBloodGroup = (bloodGroup)            => get(`/api/users/blood-group/${bloodGroup}`);
-export const searchEligibleDonors = (bloodGroup, city)     => get(`/api/users/search?bloodGroup=${encodeURIComponent(bloodGroup)}&city=${encodeURIComponent(city)}`);
+export const getUsersByBloodGroup = (bloodGroup)            => get(`/api/users?bloodGroup=${encodeURIComponent(bloodGroup)}`);
+export const searchEligibleDonors = (bloodGroup, city)     => get(`/api/users?eligibleDonors=true&bloodGroup=${encodeURIComponent(bloodGroup)}&city=${encodeURIComponent(city)}`);
+
+// ── Admin: Donors & Hospitals (user-service, role-filtered) ──────────────────
+export const getAllDonors    = () => get('/api/users?role=ROLE_USER');
+export const getAllHospitals = () => get('/api/users?role=ROLE_HOSPITAL');
+export const createUser      = (data) => post('/api/auth/register', data);
 
 // ── Campaigns (campaign-service) ─────────────────────────────────────────────
 export const getAllCampaigns        = ()               => get('/api/campaigns');
@@ -54,9 +59,11 @@ export const getAppointmentById           = (id)         => get(`/api/appointmen
 export const createAppointment            = (data)       => post('/api/appointments', data);
 export const updateAppointment            = (id, data)   => put(`/api/appointments/${id}`, data);
 export const deleteAppointment            = (id)         => del(`/api/appointments/${id}`);
-export const getAppointmentsByCampaign    = (campaignId) => get(`/api/appointments/campaign/${campaignId}`);
-export const getAppointmentsByDonor       = (donorId)    => get(`/api/appointments/donor/${donorId}`);
+export const getAppointmentsByCampaign    = (campaignId) => get(`/api/appointments/campaigns/${campaignId}`);
+export const getAppointmentsByDonor       = (donorId)    => get(`/api/appointments/donors/${donorId}`);
 export const getAppointmentsByStatus      = (status)     => get(`/api/appointments?status=${encodeURIComponent(status)}`);
+export const getAppointmentCountByCampaign = (campaignId) => get(`/api/appointments/campaigns/${campaignId}/count`);
+export const checkDonorAppointmentExists = (campaignId, donorId) => get(`/api/appointments/campaigns/${campaignId}/donors/${donorId}/exists`);
 
 // ── Blood Inventory (inventory-service) ──────────────────────────────────────
 export const getAllInventory         = ()           => get('/api/bloodinventories');
@@ -66,17 +73,17 @@ export const createInventory         = (data)      => post('/api/bloodinventorie
 export const updateInventory         = (id, data)  => put(`/api/bloodinventories/${id}`, data);
 export const deleteInventory         = (id)        => del(`/api/bloodinventories/${id}`);
 
-// ── Emergency Requests (emergency-request-service, context-path: /request) ──
-export const getAllRequests          = ()              => get('/request/api/requests');
-export const getRequestById         = (id)            => get(`/request/api/requests/${id}`);
-export const createRequest          = (data)          => post('/request/api/requests', data);
-export const updateRequest          = (id, data)      => put(`/request/api/requests/${id}`, data);
-export const deleteRequest          = (id)            => del(`/request/api/requests/${id}`);
-export const getRequestsByBloodGroup= (bloodGroup)    => get(`/request/api/requests?bloodGroup=${encodeURIComponent(bloodGroup)}`);
-export const getRequestsByStatus    = (status)        => get(`/request/api/requests?status=${encodeURIComponent(status)}`);
-export const getRequestsByPriority  = (priority)      => get(`/request/api/requests?priority=${encodeURIComponent(priority)}`);
-export const getRequestsByHospitalName = (hospitalName) => get(`/request/api/requests?hospitalName=${encodeURIComponent(hospitalName)}`);
-export const getEmergencyRequests   = ()              => get('/request/api/requests?type=EMERGENCY');
+// ── Emergency Requests (emergency-request-service, context-path: /requests) ──
+export const getAllRequests          = ()              => get('/requests/api/requests');
+export const getRequestById         = (id)            => get(`/requests/api/requests/${id}`);
+export const createRequest          = (data)          => post('/requests/api/requests', data);
+export const updateRequest          = (id, data)      => put(`/requests/api/requests/${id}`, data);
+export const deleteRequest          = (id)            => del(`/requests/api/requests/${id}`);
+export const getRequestsByBloodGroup= (bloodGroup)    => get(`/requests/api/requests?bloodGroup=${encodeURIComponent(bloodGroup)}`);
+export const getRequestsByStatus    = (status)        => get(`/requests/api/requests?status=${encodeURIComponent(status)}`);
+export const getRequestsByPriority  = (priority)      => get(`/requests/api/requests?priority=${encodeURIComponent(priority)}`);
+export const getRequestsByHospitalName = (hospitalName) => get(`/requests/api/requests?hospitalName=${encodeURIComponent(hospitalName)}`);
+export const getEmergencyRequests   = ()              => get('/requests/api/requests?type=EMERGENCY');
 
 // ── Notifications (notification-service) ─────────────────────────────────────
 export const sendNotification = (data) => post('/api/notifications/send', data);

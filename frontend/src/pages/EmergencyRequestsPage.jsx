@@ -339,6 +339,7 @@ export default function EmergencyRequestsPage() {
           <table>
             <thead>
               <tr>
+                <th>Hospital ID</th>
                 <th>Hospital</th>
                 <th>Blood group</th>
                 <th>Units</th>
@@ -351,6 +352,7 @@ export default function EmergencyRequestsPage() {
             <tbody>
               {requests.map(r => (
                 <tr key={r.id} style={r.priority === 'CRITICAL' ? { background: '#fff8f9' } : {}}>
+                  <td style={{ fontWeight: 700 }}>{r.id}</td>
                   <td>
                     <div style={{ fontWeight: 700 }}>{r.hospitalName}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>{r.contactNumber}</div>
@@ -365,15 +367,6 @@ export default function EmergencyRequestsPage() {
                       {canEdit && (
                         <button id={`er-edit-${r.id}`} className="btn btn-outline btn-sm" onClick={() => startEdit(r)}>
                           Edit
-                        </button>
-                      )}
-                      {canEdit && r.status !== 'CANCELLED' && r.status !== 'FULFILLED' && (
-                        <button
-                          id={`er-cancel-${r.id}`}
-                          className="btn btn-outline btn-sm"
-                          onClick={() => onCancelRequest(r)}
-                        >
-                          Cancel
                         </button>
                       )}
                       {canDelete && (

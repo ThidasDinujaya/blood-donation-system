@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {
   getAllCampaigns, getUpcomingCampaigns, getCampaignsByLocation,
   createCampaign, updateCampaign, deleteCampaign,
+  getAppointmentCountByCampaign
 } from '../api/api';
 import { useRole } from '../hooks/useRole';
 
@@ -13,6 +14,7 @@ const EMPTY = {
 
 export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState([]);
+  const [appointmentCounts, setAppointmentCounts] = useState({});
   const [loading,   setLoading]   = useState(true);
   const [error,     setError]     = useState('');
   const [location,  setLocation]  = useState('');
@@ -34,6 +36,14 @@ export default function CampaignsPage() {
       else if (loc)            data = await getCampaignsByLocation(loc);
       else                     data = await getAllCampaigns();
       setCampaigns(data);
+
+      // Fetch appointment counts for each campaign
+      const counts = {};
+      for (const campaign of data) {
+        const countData = await getAppointmentCountByCampaign(campaign.id);
+        counts[campaign.id] = countData.count;
+      }
+      setAppointmentCounts(counts);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -228,7 +238,7 @@ export default function CampaignsPage() {
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-3)' }}>
                     <i className="fi fi-rr-users" style={{ fontSize: 13, flexShrink: 0 }} />
-                    {c.maxDonors} donor slots
+                    {c.maxDonors - (appointmentCounts[c.id] || 0)} remaining of {c.maxDonors} slots
                   </span>
                 </div>
 

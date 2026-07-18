@@ -4,46 +4,37 @@ import com.nibm.bloodbank.userservice.Data.AuthRequest;
 import com.nibm.bloodbank.userservice.Data.AuthResponse;
 import com.nibm.bloodbank.userservice.Data.User;
 import com.nibm.bloodbank.userservice.Service.UserService;
-import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(path = "/api/auth")
 public class AuthController {
 
-    private final UserService userService;
-
-    public AuthController(UserService userService) {
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody User user) {
-        AuthResponse response = userService.registerUser(user);
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
-        }
-        return ResponseEntity.badRequest().body(response);
+    public AuthResponse register(@RequestBody User user) {
+        return userService.registerUser(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
-        AuthResponse response = userService.authenticateUser(request);
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
-        }
-        return ResponseEntity.status(401).body(response);
+    public AuthResponse login(@RequestBody AuthRequest request) {
+        return userService.authenticateUser(request);
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<AuthResponse> logout() {
-        return ResponseEntity.ok(new AuthResponse("Logout successful.", true));
+    public AuthResponse logout() {
+        return new AuthResponse("Logout successful.", true);
     }
 
-    @GetMapping("/check-email")
-    public ResponseEntity<?> checkEmailAvailability(@RequestParam String email) {
+    @GetMapping("/checkemail")
+    public Map<String, Boolean> checkEmail(@RequestParam String email) {
         boolean isRegistered = userService.isEmailRegistered(email);
-        return ResponseEntity.ok(java.util.Collections.singletonMap("isRegistered", isRegistered));
+        return Collections.singletonMap("isRegistered", isRegistered);
     }
 }

@@ -3,6 +3,7 @@ package com.nibm.bloodbank.emergency.Emergency_Request_Service.Controller;
 import com.nibm.bloodbank.emergency.Emergency_Request_Service.Data.Request;
 import com.nibm.bloodbank.emergency.Emergency_Request_Service.Service.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -32,10 +33,10 @@ public class RequestController {
     }
 
     // Delete Request using by id
-    @DeleteMapping("/api/requests/{id}")
-    public String deleteRequest(@PathVariable Integer id) {
+    @DeleteMapping("/requests/{id}")
+    public ResponseEntity<Void> deleteRequest(@PathVariable Integer id) {
         requestService.deleteRequest(id);
-        return "Request deleted successfully";
+        return ResponseEntity.noContent().build();
     }
 
     // Create Request

@@ -51,7 +51,6 @@ export default function ProfilePage() {
             phoneNumber: form.phoneNumber,
             city: form.city,
             availableToDonate: !!form.availableToDonate,
-            lastDonationDate: form.lastDonationDate || null,
           };
       await updateUser(id, payload);
       setSuccess('Profile updated successfully.');
@@ -196,19 +195,11 @@ export default function ProfilePage() {
           </div>
 
           {isDonor && (
-            <>
-              <div className="form-group">
-                <label htmlFor="prof-lastDonation">Last donation date</label>
-                <input id="prof-lastDonation" className="input" type="date" name="lastDonationDate"
-                  value={form.lastDonationDate || ''} onChange={onChange} />
-              </div>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13, color: 'var(--text-2)', cursor: 'pointer' }}>
-                <input type="checkbox" id="prof-available" name="availableToDonate"
-                  checked={!!form.availableToDonate} onChange={onChange} />
-                I am currently available to donate blood
-              </label>
-            </>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: 13, color: 'var(--text-2)', cursor: 'pointer' }}>
+              <input type="checkbox" id="prof-available" name="availableToDonate"
+                checked={!!form.availableToDonate} onChange={onChange} />
+              I am currently available to donate blood
+            </label>
           )}
 
           <div className="divider" />

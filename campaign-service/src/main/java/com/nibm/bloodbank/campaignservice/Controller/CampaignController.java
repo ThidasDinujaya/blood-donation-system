@@ -4,6 +4,7 @@ import com.nibm.bloodbank.campaignservice.Data.Appointment;
 import com.nibm.bloodbank.campaignservice.Data.Campaign;
 import com.nibm.bloodbank.campaignservice.Service.CampaignService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +37,9 @@ public class CampaignController {
     }
 
     @DeleteMapping("/campaigns/{id}")
-    public void deleteCampaign(@PathVariable int id) {
+    public ResponseEntity<Void> deleteCampaign(@PathVariable int id) {
         campaignService.deleteCampaign(id);
+        return ResponseEntity.noContent().build();
     }
     @GetMapping(path="/campaigns", params={"upcoming"})
     public List<Campaign> getUpcomingCampaigns() {
