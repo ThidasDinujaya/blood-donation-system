@@ -1,51 +1,50 @@
 package com.nibm.bloodbank.userservice.Data;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import java.time.LocalDate;
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @NotEmpty(message = "First name is required")
+    @Column(name = "first_name")
     private String firstName;
 
-    @NotEmpty(message = "Last name is required")
+    @Column(name = "last_name")
     private String lastName;
 
-    /** Official hospital / blood-bank name when role is ROLE_HOSPITAL. */
+    @Column(name = "hospital_name")
     private String hospitalName;
 
-    @NotEmpty(message = "Email cannot be empty")
-    @Email(message = "Invalid email format")
+    @Column(name = "email")
     private String email;
 
-    @NotEmpty(message = "Password cannot be empty")
-    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Column(name = "password")
     private String password;
 
-    @NotEmpty(message = "Role is required")
+    @Column(name = "role")
     private String role = "ROLE_USER";
 
+    @Column(name = "blood_group")
     private String bloodGroup;
 
-    @NotEmpty(message = "Phone number is required")
+    @Column(name = "phone_number")
     private String phoneNumber;
 
-    @NotEmpty(message = "City is required")
+    @Column(name = "city")
     private String city;
+
+    @Column(name = "available_to_donate")
     private Boolean availableToDonate = false;
-    private LocalDate lastDonationDate;
+
+    @Column(name = "last_donation_date")
+    private String lastDonationDate;
+
+    // Getters and Setters
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -80,6 +79,6 @@ public class User {
     public Boolean getAvailableToDonate() { return availableToDonate; }
     public void setAvailableToDonate(Boolean availableToDonate) { this.availableToDonate = availableToDonate; }
 
-    public LocalDate getLastDonationDate() { return lastDonationDate; }
-    public void setLastDonationDate(LocalDate lastDonationDate) { this.lastDonationDate = lastDonationDate; }
+    public String getLastDonationDate() { return lastDonationDate; }
+    public void setLastDonationDate(String lastDonationDate) { this.lastDonationDate = lastDonationDate; }
 }

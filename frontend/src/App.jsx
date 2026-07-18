@@ -6,7 +6,8 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
-import FindDonorsPage from './pages/FindDonorsPage';
+import DonorsPage from './pages/DonorsPage';
+import HospitalsPage from './pages/HospitalsPage';
 import CampaignsPage from './pages/CampaignsPage';
 import CampaignDetailPage from './pages/CampaignDetailPage';
 import MyAppointmentsPage from './pages/MyAppointmentsPage';
@@ -43,9 +44,14 @@ export default function App() {
             <InventoryPage />
           </RequireRole>
         } />
-        <Route path="/find-donors" element={
+        <Route path="/donors" element={
           <RequireRole allow={['ADMIN']}>
-            <FindDonorsPage />
+            <DonorsPage />
+          </RequireRole>
+        } />
+        <Route path="/hospitals" element={
+          <RequireRole allow={['ADMIN']}>
+            <HospitalsPage />
           </RequireRole>
         } />
       </Routes>

@@ -81,16 +81,17 @@ export default function FindDonorsPage() {
             <table>
               <thead>
                 <tr>
+                  <th>Donor ID</th>
                   <th>Donor</th>
                   <th>Blood Group</th>
                   <th>City</th>
                   <th>Phone</th>
-                  <th>Last Donation</th>
                 </tr>
               </thead>
               <tbody>
                 {donors.map(d => (
                   <tr key={d.id}>
+                    <td style={{ fontWeight: 700 }}>{d.id}</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                         <div style={{
@@ -107,7 +108,6 @@ export default function FindDonorsPage() {
                     <td><span className="badge badge-red">{d.bloodGroup}</span></td>
                     <td style={{ color: 'var(--text-2)' }}>{d.city || '—'}</td>
                     <td style={{ color: 'var(--text-2)' }}>{d.phoneNumber || '—'}</td>
-                    <td style={{ color: 'var(--text-3)' }}>{d.lastDonationDate || '—'}</td>
                   </tr>
                 ))}
               </tbody>

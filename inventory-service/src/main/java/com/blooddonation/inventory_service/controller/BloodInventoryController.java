@@ -4,6 +4,7 @@ package com.blooddonation.inventory_service.controller;
 import com.blooddonation.inventory_service.data.BloodInventory;
 import com.blooddonation.inventory_service.service.BloodInventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,8 +42,9 @@ public class BloodInventoryController {
     }
 
     @DeleteMapping(path = "/bloodinventories/{id}")
-    public void deleteInventoryById(@PathVariable int id) {
+    public ResponseEntity<Void> deleteInventoryById(@PathVariable int id) {
         obj.deleteInventoryById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(path = "/bloodinventories/reservations")

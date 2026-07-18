@@ -23,7 +23,8 @@ export default function Navbar() {
     }
     if (isAdmin) {
       roleLinks.push(
-        { to: '/find-donors', label: 'Find Donors' },
+        { to: '/donors', label: 'Donors' },
+        { to: '/hospitals', label: 'Hospitals' },
         { to: '/inventory', label: 'Inventory' },
         { to: '/my-appointments', label: 'Bookings' },
       );

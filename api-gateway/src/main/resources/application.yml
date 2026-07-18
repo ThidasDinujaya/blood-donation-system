@@ -30,6 +30,12 @@ spring:
           predicates:
             - Path=/api/auth/**
 
+        # Stats Service Routes
+        - id: stats-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/stats/**
+
         # Campaign Service Routes
         - id: campaign-service
           uri: http://localhost:8082
@@ -48,11 +54,11 @@ spring:
           predicates:
             - Path=/api/bloodinventories/**
 
-        # Emergency Request Service Routes (with context path /request)
+        # Emergency Request Service Routes (with context path /requests)
         - id: emergency-request-service
           uri: http://localhost:8084
           predicates:
-            - Path=/request/**
+            - Path=/requests/**
 
         # Notification Service Routes
         - id: notification-service

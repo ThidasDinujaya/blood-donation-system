@@ -18,4 +18,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
     );
 
     List<Appointment> findByStatus(String status);
+
+    // New method: find by campaign and donor
+    List<Appointment> findByCampaignIdAndDonorId(int campaignId, int donorId);
 }
