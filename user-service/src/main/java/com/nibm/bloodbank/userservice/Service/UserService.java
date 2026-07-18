@@ -26,7 +26,42 @@ public class UserService {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             return new AuthResponse("Email is already registered.", false);
         }
-        user.setPassword(user.getPassword());
+
+        String role = user.getRole() == null ? "ROLE_USER" : user.getRole();
+        user.setRole(role);
+
+        // All users: firstName, lastName, phoneNumber, city are mandatory
+        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
+            return new AuthResponse("First name is required.", false);
+        }
+        if (user.getLastName() == null || user.getLastName().isBlank()) {
+            return new AuthResponse("Last name is required.", false);
+        }
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().isBlank()) {
+            return new AuthResponse("Phone number is required.", false);
+        }
+        if (user.getCity() == null || user.getCity().isBlank()) {
+            return new AuthResponse("City is required.", false);
+        }
+
+        if ("ROLE_HOSPITAL".equals(role)) {
+            if (user.getHospitalName() == null || user.getHospitalName().isBlank()) {
+                return new AuthResponse("Hospital name is required.", false);
+            }
+            user.setBloodGroup(null);
+            user.setAvailableToDonate(false);
+            user.setLastDonationDate(null);
+        } else {
+            // Donor (ROLE_USER) or other non-hospital roles
+            if (user.getBloodGroup() == null || user.getBloodGroup().isBlank()) {
+                return new AuthResponse("Blood group is required for donors.", false);
+            }
+            user.setHospitalName(null);
+            if (user.getAvailableToDonate() == null) {
+                user.setAvailableToDonate(true);
+            }
+        }
+
         userRepository.save(user);
         return new AuthResponse("User registered successfully.", true);
     }
@@ -36,8 +71,9 @@ public class UserService {
         if (existingUser.isEmpty()) {
             return new AuthResponse("User not found.", false);
         }
-        if (request.getPassword().equals(existingUser.get().getPassword())) {
-            return new AuthResponse("Login successful. UserID: " + existingUser.get().getId(), true);
+        User user = existingUser.get();
+        if (request.getPassword().equals(user.getPassword())) {
+            return new AuthResponse("Login successful.", true, user.getId(), user.getRole());
         } else {
             return new AuthResponse("Invalid credentials.", false);
         }
@@ -93,11 +129,19 @@ public class UserService {
         User user = existingUserOpt.get();
         if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
         if (request.getLastName() != null) user.setLastName(request.getLastName());
-        if (request.getBloodGroup() != null) user.setBloodGroup(request.getBloodGroup());
+        if (request.getHospitalName() != null) user.setHospitalName(request.getHospitalName());
         if (request.getPhoneNumber() != null) user.setPhoneNumber(request.getPhoneNumber());
         if (request.getCity() != null) user.setCity(request.getCity());
-        if (request.getAvailableToDonate() != null) user.setAvailableToDonate(request.getAvailableToDonate());
-        if (request.getLastDonationDate() != null) user.setLastDonationDate(request.getLastDonationDate());
+
+        if ("ROLE_HOSPITAL".equals(user.getRole())) {
+            user.setBloodGroup(null);
+            user.setAvailableToDonate(false);
+            user.setLastDonationDate(null);
+        } else {
+            if (request.getBloodGroup() != null) user.setBloodGroup(request.getBloodGroup());
+            if (request.getAvailableToDonate() != null) user.setAvailableToDonate(request.getAvailableToDonate());
+            if (request.getLastDonationDate() != null) user.setLastDonationDate(request.getLastDonationDate());
+        }
 
         userRepository.save(user);
         return new AuthResponse("Profile updated successfully.", true);
@@ -121,6 +165,9 @@ public class UserService {
 
         // Filter out donors who donated less than 90 days ago
         return availableDonors.stream().filter(user -> {
+            if ("ROLE_HOSPITAL".equals(user.getRole()) || "ROLE_ADMIN".equals(user.getRole())) {
+                return false;
+            }
             if (user.getLastDonationDate() == null) {
                 return true;
             }

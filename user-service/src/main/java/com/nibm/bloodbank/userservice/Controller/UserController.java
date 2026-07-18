@@ -60,22 +60,27 @@ public class UserController {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<User>> searchEligibleDonors(
+            @RequestParam String bloodGroup,
+            @RequestParam String city) {
+        return ResponseEntity.ok(userService.getEligibleDonors(bloodGroup, city));
+    }
+
+    @GetMapping("/blood-group/{bloodGroup}")
+    public ResponseEntity<List<User>> getUsersByBloodGroup(@PathVariable String bloodGroup) {
+        List<User> users = userService.getUsersByBloodGroup(bloodGroup);
+        return ResponseEntity.ok(users);
+    }
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<User> getUserProfile(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
         return user.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/blood-group/{bloodGroup}")
-    public ResponseEntity<List<User>> getUsersByBloodGroup(@PathVariable String bloodGroup) {
-        List<User> users = userService.findByBloodGroup(bloodGroup);
-        return ResponseEntity.ok(users);
-    }
-
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public ResponseEntity<AuthResponse> updateUserProfile(
             @PathVariable Long id,
             @Valid @RequestBody UpdateProfileRequest request) {

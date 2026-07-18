@@ -18,9 +18,12 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const res = await loginUser(form);
-      if (res.userId)   sessionStorage.setItem('userId', res.userId);
-      if (res.user?.id) sessionStorage.setItem('userId', res.user.id);
-      navigate('/campaigns');
+      if (res.userId) sessionStorage.setItem('userId', res.userId);
+      if (res.role)   sessionStorage.setItem('role',   res.role);
+      const role = res.role || '';
+      if (role === 'ROLE_ADMIN') navigate('/inventory');
+      else if (role === 'ROLE_HOSPITAL') navigate('/emergency-requests');
+      else navigate('/campaigns');
     } catch (err) {
       setError(err.message || 'Invalid email or password.');
     } finally {
@@ -31,12 +34,15 @@ export default function LoginPage() {
   const imageUrl = "/login-hero.jpg";
 
   return (
-    <div className="auth-wrap">
-      {/* Left panel — clean image, no text */}
-      <div
-        className="auth-left"
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      />
+    <div style={{ display: 'flex', height: 'calc(100vh - 58px)' }}>
+
+      {/* Left panel — hero image */}
+      <div style={{
+        flex: 1,
+        backgroundImage: `url(${imageUrl})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }} />
 
       {/* Right panel */}
       <div className="auth-right">

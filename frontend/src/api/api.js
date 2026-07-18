@@ -1,8 +1,9 @@
 // src/api/api.js
-// Central API layer — all fetch calls go through the gateway at VITE_GATEWAY_URL.
-// To change a service URL, update .env. Pages never know raw service ports.
+// Central API layer. In dev, VITE_GATEWAY_URL is empty and Vite proxies /api and
+// /request to the gateway (see vite.config.js) to avoid browser CORS issues.
 
-const GW = import.meta.env.VITE_GATEWAY_URL;
+// Empty string = same-origin (Vite proxies /api and /request to the gateway).
+const GW = import.meta.env.VITE_GATEWAY_URL || '';
 
 async function request(method, path, body) {
   const opts = {
@@ -53,8 +54,8 @@ export const getAppointmentById           = (id)         => get(`/api/appointmen
 export const createAppointment            = (data)       => post('/api/appointments', data);
 export const updateAppointment            = (id, data)   => put(`/api/appointments/${id}`, data);
 export const deleteAppointment            = (id)         => del(`/api/appointments/${id}`);
-export const getAppointmentsByCampaign    = (campaignId) => get(`/api/appointments?campaignId=${campaignId}`);
-export const getAppointmentsByDonor       = (donorId)    => get(`/api/appointments?donorId=${donorId}`);
+export const getAppointmentsByCampaign    = (campaignId) => get(`/api/appointments/campaign/${campaignId}`);
+export const getAppointmentsByDonor       = (donorId)    => get(`/api/appointments/donor/${donorId}`);
 export const getAppointmentsByStatus      = (status)     => get(`/api/appointments?status=${encodeURIComponent(status)}`);
 
 // ── Blood Inventory (inventory-service) ──────────────────────────────────────
@@ -74,6 +75,7 @@ export const deleteRequest          = (id)            => del(`/request/api/reque
 export const getRequestsByBloodGroup= (bloodGroup)    => get(`/request/api/requests?bloodGroup=${encodeURIComponent(bloodGroup)}`);
 export const getRequestsByStatus    = (status)        => get(`/request/api/requests?status=${encodeURIComponent(status)}`);
 export const getRequestsByPriority  = (priority)      => get(`/request/api/requests?priority=${encodeURIComponent(priority)}`);
+export const getRequestsByHospitalName = (hospitalName) => get(`/request/api/requests?hospitalName=${encodeURIComponent(hospitalName)}`);
 export const getEmergencyRequests   = ()              => get('/request/api/requests?type=EMERGENCY');
 
 // ── Notifications (notification-service) ─────────────────────────────────────

@@ -4,6 +4,7 @@ import {
   getAllCampaigns, getUpcomingCampaigns, getCampaignsByLocation,
   createCampaign, updateCampaign, deleteCampaign,
 } from '../api/api';
+import { useRole } from '../hooks/useRole';
 
 const EMPTY = {
   title: '', description: '', date: '', startTime: '', endTime: '',
@@ -16,6 +17,8 @@ export default function CampaignsPage() {
   const [error,     setError]     = useState('');
   const [location,  setLocation]  = useState('');
   const [filter,    setFilter]    = useState('all');
+
+  const { isAdmin, isDonor } = useRole();
 
   // form state
   const [showForm, setShowForm] = useState(false);
@@ -92,18 +95,20 @@ export default function CampaignsPage() {
           </button>
         </form>
 
-        <button
-          id="camp-add"
-          className="btn btn-primary"
-          style={{ alignSelf: 'flex-end' }}
-          onClick={() => { cancelForm(); setShowForm(true); }}
-        >
-          + Add Campaign
-        </button>
+        {isAdmin && (
+          <button
+            id="camp-add"
+            className="btn btn-primary"
+            style={{ alignSelf: 'flex-end' }}
+            onClick={() => { cancelForm(); setShowForm(true); }}
+          >
+            + Add Campaign
+          </button>
+        )}
       </div>
 
-      {/* Inline create / edit form */}
-      {showForm && (
+      {/* Inline create / edit form — admin only */}
+      {isAdmin && showForm && (
         <div className="card" style={{ marginBottom: 24, borderTop: '3px solid var(--red)' }}>
           <div className="section-label">{editId ? 'Edit campaign' : 'New campaign'}</div>
           <form onSubmit={onSave} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -231,11 +236,15 @@ export default function CampaignsPage() {
                 <div style={{ display: 'flex', gap: 6, marginTop: 14, alignItems: 'center', flexWrap: 'wrap' }}>
                   <Link to={`/campaigns/${c.id}`} style={{ flex: 1 }}>
                     <span className="btn btn-ghost btn-sm" style={{ width: '100%', justifyContent: 'center' }}>
-                      View &amp; Book →
+                      {isDonor ? 'View & Book →' : 'View details →'}
                     </span>
                   </Link>
-                  <button id={`camp-edit-${c.id}`} className="btn btn-outline btn-sm" onClick={() => startEdit(c)}>Edit</button>
-                  <button id={`camp-del-${c.id}`}  className="btn btn-danger btn-sm"  onClick={() => onDelete(c.id)}>Delete</button>
+                  {isAdmin && (
+                    <>
+                      <button id={`camp-edit-${c.id}`} className="btn btn-outline btn-sm" onClick={() => startEdit(c)}>Edit</button>
+                      <button id={`camp-del-${c.id}`}  className="btn btn-danger btn-sm"  onClick={() => onDelete(c.id)}>Delete</button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
