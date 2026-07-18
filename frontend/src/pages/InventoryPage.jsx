@@ -3,6 +3,7 @@ import {
   getAllInventory, getInventoryByBloodGroup,
   createInventory, updateInventory, deleteInventory,
 } from '../api/api';
+import { useRole } from '../hooks/useRole';
 
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 const EMPTY = { bloodGroup: '', unitsAvailable: '', bloodBankName: '', location: '', expiryDate: '' };
@@ -22,6 +23,7 @@ export default function InventoryPage() {
   const [form,      setForm]      = useState(EMPTY);
   const [editId,    setEditId]    = useState(null);
   const [saving,    setSaving]    = useState(false);
+  const { isAdmin } = useRole();
 
   async function load(bg) {
     setLoading(true); setError('');
@@ -93,14 +95,16 @@ export default function InventoryPage() {
             </select>
           </div>
         </div>
-        <button id="inv-add" className="btn btn-primary" style={{ alignSelf: 'flex-end' }}
-          onClick={() => { cancelForm(); setShowForm(true); }}>
-          + Add record
-        </button>
+        {isAdmin && (
+          <button id="inv-add" className="btn btn-primary" style={{ alignSelf: 'flex-end' }}
+            onClick={() => { cancelForm(); setShowForm(true); }}>
+            + Add record
+          </button>
+        )}
       </div>
 
-      {/* Inline form */}
-      {showForm && (
+      {/* Inline form — admin only */}
+      {isAdmin && showForm && (
         <div className="card" style={{ marginBottom: 24, borderTop: '3px solid var(--red)' }}>
           <div className="section-label">{editId ? 'Edit record' : 'New inventory record'}</div>
           <form onSubmit={onSave} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -184,8 +188,12 @@ export default function InventoryPage() {
                   </td>
                   <td>
                     <div style={{ display: 'flex', gap: 6 }}>
-                      <button id={`inv-edit-${item.id}`} className="btn btn-outline btn-sm" onClick={() => startEdit(item)}>Edit</button>
-                      <button id={`inv-del-${item.id}`}  className="btn btn-danger btn-sm"  onClick={() => onDelete(item.id)}>Delete</button>
+                      {isAdmin && (
+                        <>
+                          <button id={`inv-edit-${item.id}`} className="btn btn-outline btn-sm" onClick={() => startEdit(item)}>Edit</button>
+                          <button id={`inv-del-${item.id}`}  className="btn btn-danger btn-sm"  onClick={() => onDelete(item.id)}>Delete</button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

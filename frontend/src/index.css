@@ -138,10 +138,11 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-2);
   border-color: var(--border);
 }
-.btn-outline:hover:not(:disabled) {
-  color: var(--text);
-  border-color: #c8c8c8;
-  background: var(--surface-2);
+.btn-outline:hover:not(:disabled),
+.btn-outline:active:not(:disabled) {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
 }
 
 .btn-ghost {

@@ -1,34 +1,54 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import RequireRole from './components/RequireRole';
 
-import LoginPage              from './pages/LoginPage';
-import RegisterPage           from './pages/RegisterPage';
-import ProfilePage            from './pages/ProfilePage';
-import FindDonorsPage         from './pages/FindDonorsPage';
-import CampaignsPage          from './pages/CampaignsPage';
-import CampaignDetailPage     from './pages/CampaignDetailPage';
-import MyAppointmentsPage     from './pages/MyAppointmentsPage';
-import InventoryPage          from './pages/InventoryPage';
-import EmergencyRequestsPage  from './pages/EmergencyRequestsPage';
+import HomePage from './pages/HomePage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProfilePage from './pages/ProfilePage';
+import FindDonorsPage from './pages/FindDonorsPage';
+import CampaignsPage from './pages/CampaignsPage';
+import CampaignDetailPage from './pages/CampaignDetailPage';
+import MyAppointmentsPage from './pages/MyAppointmentsPage';
+import InventoryPage from './pages/InventoryPage';
+import EmergencyRequestsPage from './pages/EmergencyRequestsPage';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/login"    element={<LoginPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/"                    element={<Navigate to="/campaigns" replace />} />
-        <Route path="/campaigns"           element={<CampaignsPage />} />
-        <Route path="/campaigns/:id"       element={<CampaignDetailPage />} />
-        <Route path="/profile/:id"         element={<ProfilePage />} />
-        <Route path="/find-donors"         element={<FindDonorsPage />} />
-        <Route path="/my-appointments"     element={<MyAppointmentsPage />} />
-        <Route path="/inventory"           element={<InventoryPage />} />
-        <Route path="/emergency-requests"  element={<EmergencyRequestsPage />} />
+        <Route path="/campaigns" element={<CampaignsPage />} />
+        <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
+        <Route path="/profile/:id" element={
+          <RequireRole allow={['ADMIN', 'DONOR', 'HOSPITAL']}>
+            <ProfilePage />
+          </RequireRole>
+        } />
+        <Route path="/my-appointments" element={
+          <RequireRole allow={['DONOR', 'ADMIN']}>
+            <MyAppointmentsPage />
+          </RequireRole>
+        } />
+        <Route path="/emergency-requests" element={
+          <RequireRole allow={['HOSPITAL', 'ADMIN']}>
+            <EmergencyRequestsPage />
+          </RequireRole>
+        } />
+        <Route path="/inventory" element={
+          <RequireRole allow={['ADMIN']}>
+            <InventoryPage />
+          </RequireRole>
+        } />
+        <Route path="/find-donors" element={
+          <RequireRole allow={['ADMIN']}>
+            <FindDonorsPage />
+          </RequireRole>
+        } />
       </Routes>
     </BrowserRouter>
   );
 }
-
-

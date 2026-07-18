@@ -39,6 +39,8 @@ Thumbs.db
 
 # vscode
 .vscode/
+.cursor/
+.github/
 
 # Node/React dependencies and builds
 node_modules/

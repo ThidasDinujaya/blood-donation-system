@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getAppointmentsByDonor, deleteAppointment } from '../api/api';
+import { getAllAppointments, getAppointmentsByDonor, deleteAppointment } from '../api/api';
+import { useRole } from '../hooks/useRole';
 
 const STATUS_BADGE = {
   PENDING:   'badge-yellow',
@@ -9,19 +10,25 @@ const STATUS_BADGE = {
 };
 
 export default function MyAppointmentsPage() {
-  const userId = sessionStorage.getItem('userId');
-  const [donorId,  setDonorId]  = useState(userId || '');
-  const [appts,    setAppts]    = useState([]);
-  const [loading,  setLoading]  = useState(false);
-  const [error,    setError]    = useState('');
+  const { userId, isAdmin } = useRole();
+  const [appts, setAppts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [deleting, setDeleting] = useState(null);
-  const [loaded,   setLoaded]   = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  async function load(id) {
-    if (!id) return;
-    setLoading(true); setError('');
+  async function load() {
+    if (!userId && !isAdmin) {
+      setError('Please log in to view bookings.');
+      return;
+    }
+    setLoading(true);
+    setError('');
     try {
-      setAppts(await getAppointmentsByDonor(id));
+      const data = isAdmin
+        ? await getAllAppointments()
+        : await getAppointmentsByDonor(userId);
+      setAppts(data);
       setLoaded(true);
     } catch (err) {
       setError(err.message);
@@ -30,10 +37,13 @@ export default function MyAppointmentsPage() {
     }
   }
 
-  useEffect(() => { if (userId) load(userId); }, []);
+  useEffect(() => {
+    if (userId || isAdmin) load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, isAdmin]);
 
   async function onCancel(id) {
-    if (!confirm('Cancel this appointment?')) return;
+    if (!confirm(isAdmin ? 'Delete this appointment?' : 'Cancel this appointment?')) return;
     setDeleting(id);
     try {
       await deleteAppointment(id);
@@ -48,23 +58,15 @@ export default function MyAppointmentsPage() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1>My Appointments</h1>
-        <p>View and manage your donation bookings</p>
+        <h1>{isAdmin ? 'All Appointments' : 'My Appointments'}</h1>
+        <p>
+          {isAdmin
+            ? 'View and manage every donor booking across campaigns'
+            : `Donation bookings for Donor ID ${userId || '—'}`}
+        </p>
       </div>
 
-      {/* Load bar */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 24, alignItems: 'flex-end' }}>
-        <div className="form-group" style={{ marginBottom: 0 }}>
-          <label htmlFor="appts-id">Donor ID</label>
-          <input id="appts-id" className="input" type="number" placeholder="Enter donor ID"
-            value={donorId} onChange={e => setDonorId(e.target.value)} style={{ width: 160 }} />
-        </div>
-        <button id="appts-load" className="btn btn-primary" onClick={() => load(donorId)}>
-          Load appointments
-        </button>
-      </div>
-
-      {error   && <div className="alert alert-error" style={{ marginBottom: 16 }}>{error}</div>}
+      {error && <div className="alert alert-error" style={{ marginBottom: 16 }}>{error}</div>}
       {loading && <div className="spinner-wrap"><div className="spinner" /></div>}
 
       {!loading && loaded && appts.length === 0 && (
@@ -73,7 +75,7 @@ export default function MyAppointmentsPage() {
             <i className="fi fi-rr-calendar" style={{ fontSize: '2.2rem', color: 'var(--red)', opacity: 0.4 }} />
           </div>
           <h3>No appointments found</h3>
-          <p>Book a slot at a campaign to get started.</p>
+          <p>{isAdmin ? 'No bookings have been made yet.' : 'Book a slot at a campaign to get started.'}</p>
         </div>
       )}
 
@@ -87,6 +89,7 @@ export default function MyAppointmentsPage() {
               <thead>
                 <tr>
                   <th>#</th>
+                  {isAdmin && <th>Donor ID</th>}
                   <th>Campaign</th>
                   <th>Date</th>
                   <th>Time Slot</th>
@@ -98,6 +101,9 @@ export default function MyAppointmentsPage() {
                 {appts.map(a => (
                   <tr key={a.id}>
                     <td style={{ color: 'var(--text-3)', fontWeight: 500 }}>#{a.id}</td>
+                    {isAdmin && (
+                      <td style={{ fontWeight: 600 }}>{a.donorId}</td>
+                    )}
                     <td style={{ fontWeight: 600 }}>Campaign #{a.campaignId}</td>
                     <td>{a.appointmentDate}</td>
                     <td style={{ color: 'var(--text-2)' }}>{a.timeSlot}</td>
@@ -111,9 +117,9 @@ export default function MyAppointmentsPage() {
                         id={`appt-cancel-${a.id}`}
                         className="btn btn-danger btn-sm"
                         onClick={() => onCancel(a.id)}
-                        disabled={deleting === a.id || a.status === 'CANCELLED'}
+                        disabled={deleting === a.id || (!isAdmin && a.status === 'CANCELLED')}
                       >
-                        {deleting === a.id ? '…' : 'Cancel'}
+                        {deleting === a.id ? '…' : isAdmin ? 'Delete' : 'Cancel'}
                       </button>
                     </td>
                   </tr>
