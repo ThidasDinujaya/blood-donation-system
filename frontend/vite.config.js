@@ -7,7 +7,15 @@ export default defineConfig({
     port: 3000,
     // Same-origin proxy avoids browser CORS failures (localhost vs 127.0.0.1).
     proxy: {
-      '/api': {
+      '/user': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/campaign': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/inventory': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
@@ -15,7 +23,7 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
-      '/requests': {
+      '/notification': {
         target: 'http://localhost:8080',
         changeOrigin: true,
       },

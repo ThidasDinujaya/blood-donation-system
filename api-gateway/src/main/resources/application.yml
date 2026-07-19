@@ -18,53 +18,45 @@ spring:
             allowCredentials: true
             maxAge: 3600
       routes:
-        # User Service Routes
+        # User Service Routes - strip /user prefix
         - id: user-service
           uri: http://localhost:8081
           predicates:
-            - Path=/api/users/**
+            - Path=/user/**
+          filters:
+            - StripPrefix=1
 
-        # Auth Service Routes
-        - id: auth-service
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/auth/**
-
-        # Stats Service Routes
-        - id: stats-service
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/stats/**
-
-        # Campaign Service Routes
+        # Campaign Service Routes - strip /campaign prefix
         - id: campaign-service
           uri: http://localhost:8082
           predicates:
-            - Path=/api/campaigns/**
+            - Path=/campaign/**
+          filters:
+            - StripPrefix=1
 
-        # Appointment Service Routes
-        - id: appointment-service
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/appointments/**
-
-        # Blood Inventory Service Routes
+        # Blood Inventory Service Routes - strip /inventory prefix
         - id: inventory-service
           uri: http://localhost:8083
           predicates:
-            - Path=/api/bloodinventories/**
+            - Path=/inventory/**
+          filters:
+            - StripPrefix=1
 
-        # Emergency Request Service Routes (with context path /requests)
+        # Emergency Request Service Routes - strip /request prefix
         - id: emergency-request-service
           uri: http://localhost:8084
           predicates:
-            - Path=/requests/**
+            - Path=/request/**
+          filters:
+            - StripPrefix=1
 
-        # Notification Service Routes
+        # Notification Service Routes - strip /notification prefix
         - id: notification-service
           uri: http://localhost:8085
           predicates:
-            - Path=/api/notifications/**
+            - Path=/notification/**
+          filters:
+            - StripPrefix=1
 
 server:
   port: 8080
